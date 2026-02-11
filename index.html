@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EUSL GPA Calculator - Faculty of Science</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <h1>Faculty of Science, Eastern University, Sri Lanka</h1>
+                <h3>GPA Calculator</h3>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Configuration Panel -->
+            <section class="config-panel">
+                <div class="config-group">
+                    <label for="degreeMode">Degree Mode:</label>
+                    <select id="degreeMode">
+                        <option value="3-year">3-Year General Degree</option>
+                        <option value="4-year">4-Year Honours/Special Degree</option>
+                    </select>
+                </div>
+
+                <div class="config-group">
+                    <label for="levelSelect">Select Level/Year:</label>
+                    <select id="levelSelect">
+                        <option value="100">Level 100 (Year 1)</option>
+                        <option value="200">Level 200 (Year 2)</option>
+                        <option value="300">Level 300 (Year 3)</option>
+                        <option value="400">Level 400 (Year 4 - Honours Only)</option>
+                    </select>
+                </div>
+
+                <button id="resetButton" class="btn-reset">Reset All</button>
+            </section>
+
+            <!-- Subjects Section -->
+            <section class="subjects-section">
+                <h2>Subjects - <span id="levelTitle"></span></h2>
+                <div id="subjectsContainer" class="subjects-container"></div>
+            </section>
+
+            <!-- Add Custom Subject Section -->
+            <section class="add-subject-section">
+                <h3>Add Subject Not in List</h3>
+                <div class="custom-subject-form">
+                    <input type="text" id="customCode" placeholder="Course Code (e.g., PH3012)" maxlength="20">
+                    <input type="text" id="customName" placeholder="Subject Name" maxlength="50">
+                    <input type="number" id="customCredits" placeholder="Credits" min="1" max="10">
+                    <select id="customGrade">
+                        <option value="">Select Grade</option>
+                        <option value="A+">A+ (4.0)</option>
+                        <option value="A">A (4.0)</option>
+                        <option value="A-">A- (3.7)</option>
+                        <option value="B+">B+ (3.3)</option>
+                        <option value="B">B (3.0)</option>
+                        <option value="B-">B- (2.7)</option>
+                        <option value="C+">C+ (2.3)</option>
+                        <option value="C">C (2.0)</option>
+                        <option value="C-">C- (1.7)</option>
+                        <option value="D+">D+ (1.3)</option>
+                        <option value="D">D (1.0)</option>
+                        <option value="E">E (0.0)</option>
+                    </select>
+                    <button id="addCustomButton" class="btn-add">Add Custom Subject</button>
+                </div>
+            </section>
+
+            <!-- Results Dashboard -->
+            <section class="results-dashboard">
+                <h2>Results</h2>
+                <div class="results-grid">
+                    <div class="result-card">
+                        <div class="result-label">Cumulative GPA</div>
+                        <div class="result-value" id="cumulativeGpa">0.00</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Final GPA</div>
+                        <div class="result-value" id="finalGpa">0.00</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Academic Class</div>
+                        <div class="result-value" id="academicClass">—</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Total Credits</div>
+                        <div class="result-value" id="totalCredits">0</div>
+                    </div>
+                </div>
+
+                <!-- Detailed Stats -->
+                <div class="detailed-stats">
+                    <h3>Summary Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Subjects Completed:</span>
+                            <span class="stat-value" id="subjectsCompleted">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Credits Earned:</span>
+                            <span class="stat-value" id="creditsEarned">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Quality Points:</span>
+                            <span class="stat-value" id="qualityPoints">0.00</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Excluded Subjects:</span>
+                            <span class="stat-value" id="excludedCount">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grading Information -->
+                <div class="grading-info">
+                    <h3>Grading Scale (EUSL)</h3>
+                    <table class="grading-table">
+                        <thead>
+                            <tr>
+                                <th>Grade</th>
+                                <th>GPA Value</th>
+                                <th>Grade</th>
+                                <th>GPA Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>A+</td>
+                                <td>4.0</td>
+                                <td>B-</td>
+                                <td>2.7</td>
+                            </tr>
+                            <tr>
+                                <td>A</td>
+                                <td>4.0</td>
+                                <td>C+</td>
+                                <td>2.3</td>
+                            </tr>
+                            <tr>
+                                <td>A-</td>
+                                <td>3.7</td>
+                                <td>C</td>
+                                <td>2.0</td>
+                            </tr>
+                            <tr>
+                                <td>B+</td>
+                                <td>3.3</td>
+                                <td>C-</td>
+                                <td>1.7</td>
+                            </tr>
+                            <tr>
+                                <td>B</td>
+                                <td>3.0</td>
+                                <td>D+</td>
+                                <td>1.3</td>
+                            </tr>
+                            <tr>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>D/E</td>
+                                <td>1.0/0.0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="grading-note">
+                        <strong>Exclusion Rule:</strong> Courses starting with ENG, CPD, or SLV are excluded from GPA.
+                        <br>
+                        <strong>Inclusion Rule:</strong> All PH, CH, MT, CS, and EN subjects are included.
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="footer">
+            <p>&copy; 2026 GPA Calculator | Faculty of Science, Eastern University, Sri Lanka</p>
+            <p class="powered-by">Powered by HiruNova-X</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
