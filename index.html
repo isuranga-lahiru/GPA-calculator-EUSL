@@ -93,7 +93,17 @@
 
             <!-- Results Dashboard -->
             <section class="results-dashboard">
-                <h2>Results</h2>
+                <div class="results-header">
+                    <h2>Results</h2>
+                    <div class="results-actions">
+                        <button id="printButton" class="btn-print" title="Print or save as PDF">
+                            <span class="btn-icon">🖨️</span> Print
+                        </button>
+                        <button id="shareButton" class="btn-share" title="Share on social media">
+                            <span class="btn-icon">📤</span> Share
+                        </button>
+                    </div>
+                </div>
                 <div class="results-grid">
                     <div class="result-card">
                         <div class="result-label">Cumulative GPA</div>
@@ -194,6 +204,28 @@
                     </p>
                 </div>
             </section>
+
+            <!-- Share Modal -->
+            <div id="shareModal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Share Your Results</h3>
+                        <button id="closeModal" class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <a id="shareWhatsApp" class="share-option" target="_blank">
+                            <span class="share-icon">💬</span>
+                            <span>WhatsApp</span>
+                        </a>
+                        <a id="shareFacebook" class="share-option" target="_blank">
+                            <span class="share-icon">f</span>
+                            <span>Facebook</span>
+                        </a>
+                        <input type="text" id="shareLink" class="share-link" readonly placeholder="Share link">
+                        <button id="copyLinkButton" class="btn-copy">Copy Link</button>
+                    </div>
+                </div>
+            </div>
         </main>
 
         <!-- Footer Section -->

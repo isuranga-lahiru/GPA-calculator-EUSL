@@ -40,15 +40,45 @@ function setupEventListeners() {
     const levelSelect = document.getElementById('levelSelect');
     const resetButton = document.getElementById('resetButton');
     const addCustomButton = document.getElementById('addCustomButton');
+    const printButton = document.getElementById('printButton');
+    const shareButton = document.getElementById('shareButton');
+    const closeModal = document.getElementById('closeModal');
+    const shareModal = document.getElementById('shareModal');
+    const copyLinkButton = document.getElementById('copyLinkButton');
 
-    combinationSelect.addEventListener('change', handleCombinationChange);
-    degreeMode.addEventListener('change', handleDegreeModeChange);
-    levelSelect.addEventListener('change', updateSubjectsDisplay);
-    resetButton.addEventListener('click', resetAll);
-    addCustomButton.addEventListener('click', addCustomSubject);
+    console.log('Setup Event Listeners:', {
+        printButton: !!printButton,
+        shareButton: !!shareButton,
+        closeModal: !!closeModal,
+        shareModal: !!shareModal,
+        copyLinkButton: !!copyLinkButton
+    });
+
+    if (combinationSelect) combinationSelect.addEventListener('change', handleCombinationChange);
+    if (degreeMode) degreeMode.addEventListener('change', handleDegreeModeChange);
+    if (levelSelect) levelSelect.addEventListener('change', updateSubjectsDisplay);
+    if (resetButton) resetButton.addEventListener('click', resetAll);
+    if (addCustomButton) addCustomButton.addEventListener('click', addCustomSubject);
+    if (printButton) {
+        printButton.addEventListener('click', printResults);
+        console.log('Print button listener attached');
+    }
+    if (shareButton) {
+        shareButton.addEventListener('click', openShareModal);
+        console.log('Share button listener attached');
+    }
+    if (closeModal) closeModal.addEventListener('click', closeShareModal);
+    if (copyLinkButton) copyLinkButton.addEventListener('click', copyShareLink);
+    
+    // Close modal when clicking outside
+    if (shareModal) {
+        shareModal.addEventListener('click', (e) => {
+            if (e.target === shareModal) closeShareModal();
+        });
+    }
 
     // Disable Level 400 for 3-year degree
-    handleDegreeModeChange();
+    if (degreeMode) handleDegreeModeChange();
 }
 
 // Handle Degree Mode Change
@@ -433,3 +463,230 @@ window.addEventListener('beforeunload', () => {
     // Uncomment to enable auto-save
     // saveUserData();
 });
+
+// Print Results
+function printResults() {
+    const degreeMode = document.getElementById('degreeMode').value;
+    const level = document.getElementById('levelSelect').value;
+    const combination = document.getElementById('combinationSelect').value || 'All';
+    const cumulativeGpa = document.getElementById('cumulativeGpa').textContent;
+    const finalGpa = document.getElementById('finalGpa').textContent;
+    const academicClass = document.getElementById('academicClass').textContent;
+    const totalCredits = document.getElementById('totalCredits').textContent;
+    const subjectsCompleted = document.getElementById('subjectsCompleted').textContent;
+    const creditsEarned = document.getElementById('creditsEarned').textContent;
+    const qualityPoints = document.getElementById('qualityPoints').textContent;
+    
+    const degreeText = degreeMode === '3-year' ? '3-Year General Degree' : '4-Year Honours/Special Degree';
+    const currentDate = new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric'
+    });
+    
+    const printWindow = window.open('', '', 'width=900,height=600');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>EUSL GPA Calculator - Results</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    color: #333;
+                    padding: 40px;
+                    background: white;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    border-bottom: 3px solid #3f51b5;
+                    padding-bottom: 20px;
+                }
+                .header h1 {
+                    color: #1a237e;
+                    font-size: 24px;
+                    margin-bottom: 5px;
+                }
+                .header h3 {
+                    color: #3f51b5;
+                    font-size: 16px;
+                    font-weight: 300;
+                    margin-bottom: 10px;
+                }
+                .date {
+                    color: #666;
+                    font-size: 12px;
+                }
+                .info-box {
+                    background: #f5f7ff;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    border-left: 4px solid #3f51b5;
+                }
+                .info-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                }
+                .info-label { font-weight: 600; color: #333; }
+                .info-value { color: #3f51b5; font-weight: 700; }
+                .results-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 20px;
+                    margin-bottom: 30px;
+                }
+                .result-box {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    text-align: center;
+                }
+                .result-label {
+                    font-size: 12px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    opacity: 0.9;
+                    margin-bottom: 8px;
+                }
+                .result-value {
+                    font-size: 32px;
+                    font-weight: 800;
+                }
+                .stats {
+                    background: #f5f7ff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    margin-top: 20px;
+                }
+                .stat-item {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 8px 0;
+                    border-bottom: 1px solid #e0e0e0;
+                }
+                .stat-item:last-child { border-bottom: none; }
+                .stat-label { font-weight: 600; color: #333; }
+                .stat-value { color: #3f51b5; font-weight: 700; }
+                .footer {
+                    text-align: center;
+                    margin-top: 30px;
+                    padding-top: 20px;
+                    border-top: 1px solid #ddd;
+                    font-size: 12px;
+                    color: #666;
+                }
+                @media print {
+                    body { padding: 20px; }
+                    .results-grid { gap: 15px; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>Faculty of Science, Eastern University, Sri Lanka</h1>
+                <h3>GPA Calculator Results</h3>
+                <div class="date">Generated on ${currentDate}</div>
+            </div>
+            
+            <div class="info-box">
+                <div class="info-row">
+                    <span class="info-label">Degree Mode:</span>
+                    <span class="info-value">${degreeText}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Combination:</span>
+                    <span class="info-value">${combination}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Current Level:</span>
+                    <span class="info-value">Level ${level}</span>
+                </div>
+            </div>
+            
+            <div class="results-grid">
+                <div class="result-box">
+                    <div class="result-label">Cumulative GPA</div>
+                    <div class="result-value">${cumulativeGpa}</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-label">Final GPA</div>
+                    <div class="result-value">${finalGpa}</div>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Academic Classification</span>
+                    <span class="stat-value">${academicClass}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Credits</span>
+                    <span class="stat-value">${totalCredits}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Subjects Completed</span>
+                    <span class="stat-value">${subjectsCompleted}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Credits Earned</span>
+                    <span class="stat-value">${creditsEarned}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Quality Points</span>
+                    <span class="stat-value">${qualityPoints}</span>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>This is an unofficial GPA calculation tool. Please verify results with the official EUSL Registrar's Office.</p>
+                <p>EUSL GPA Calculator | Powered by HiruNova-X</p>
+            </div>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    setTimeout(() => {
+        printWindow.print();
+    }, 250);
+}
+
+// Share Functions
+function openShareModal() {
+    const modal = document.getElementById('shareModal');
+    const finalGpa = document.getElementById('finalGpa').textContent;
+    const academicClass = document.getElementById('academicClass').textContent;
+    const cumulativeGpa = document.getElementById('cumulativeGpa').textContent;
+    
+    const message = `Check my GPA Calculation from EUSL GPA Calculator:\nCumulative GPA: ${cumulativeGpa}\nFinal GPA: ${finalGpa}\nClass: ${academicClass}\n\nCalculate yours now!`;
+    const shareUrl = encodeURIComponent(window.location.href);
+    const encodedMessage = encodeURIComponent(message);
+    
+    document.getElementById('shareWhatsApp').href = `https://wa.me/?text=${encodedMessage}%20${shareUrl}`;
+    document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+    document.getElementById('shareLink').value = window.location.href;
+    
+    modal.classList.remove('hidden');
+}
+
+function closeShareModal() {
+    document.getElementById('shareModal').classList.add('hidden');
+}
+
+function copyShareLink() {
+    const shareLink = document.getElementById('shareLink');
+    shareLink.select();
+    document.execCommand('copy');
+    
+    const button = document.getElementById('copyLinkButton');
+    const originalText = button.textContent;
+    button.textContent = '✓ Copied!';
+    setTimeout(() => {
+        button.textContent = originalText;
+    }, 2000);
+}
