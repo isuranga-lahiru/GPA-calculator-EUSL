@@ -1,9 +1,11 @@
 // Global Variables
 let subjectsData = {};
+let combinationsData = {};
 let gradeValues = {};
 let academicClassRules = {};
 let userGrades = {}; // Store selected grades: { code: grade }
 let customSubjects = []; // Store custom subjects
+let selectedCombination = ''; // Track selected combination
 
 // Subject Selection (for tracking which subjects user is working with)
 let selectedSubjects = new Set();
@@ -22,6 +24,7 @@ async function loadSubjectsData() {
         const response = await fetch('subjects.json');
         const data = await response.json();
         subjectsData = data.levels;
+        combinationsData = data.combinations;
         gradeValues = data.grades;
         academicClassRules = data.academicClass;
     } catch (error) {
@@ -32,11 +35,13 @@ async function loadSubjectsData() {
 
 // Setup Event Listeners
 function setupEventListeners() {
+    const combinationSelect = document.getElementById('combinationSelect');
     const degreeMode = document.getElementById('degreeMode');
     const levelSelect = document.getElementById('levelSelect');
     const resetButton = document.getElementById('resetButton');
     const addCustomButton = document.getElementById('addCustomButton');
 
+    combinationSelect.addEventListener('change', handleCombinationChange);
     degreeMode.addEventListener('change', handleDegreeModeChange);
     levelSelect.addEventListener('change', updateSubjectsDisplay);
     resetButton.addEventListener('click', resetAll);
@@ -63,6 +68,12 @@ function handleDegreeModeChange() {
     }
 }
 
+// Handle Combination Change
+function handleCombinationChange(event) {
+    selectedCombination = event.target.value;
+    updateSubjectsDisplay();
+}
+
 // Update Subjects Display
 function updateSubjectsDisplay() {
     const levelSelect = document.getElementById('levelSelect');
@@ -72,15 +83,43 @@ function updateSubjectsDisplay() {
     // Update level title
     document.getElementById('levelTitle').textContent = levelData.name;
 
+    // Get filtered subjects based on combination
+    let subjectsToDisplay = levelData.subjects;
+    
+    if (selectedCombination) {
+        subjectsToDisplay = levelData.subjects.filter(subject => 
+            subject.combinations && subject.combinations.includes(selectedCombination)
+        );
+    }
+
     // Clear container
     const container = document.getElementById('subjectsContainer');
     container.innerHTML = '';
 
+    // Add section info if combination is selected
+    if (selectedCombination && combinationsData[selectedCombination]) {
+        const combinationInfo = document.createElement('div');
+        combinationInfo.className = 'combination-info';
+        combinationInfo.innerHTML = `
+            <h4>${combinationsData[selectedCombination].name}</h4>
+            <p>${combinationsData[selectedCombination].description}</p>
+        `;
+        container.appendChild(combinationInfo);
+    }
+
     // Add subject cards
-    levelData.subjects.forEach(subject => {
+    subjectsToDisplay.forEach(subject => {
         const card = createSubjectCard(subject);
         container.appendChild(card);
     });
+
+    // Show message if no subjects available
+    if (subjectsToDisplay.length === 0 && selectedCombination) {
+        const noSubjectsMsg = document.createElement('div');
+        noSubjectsMsg.className = 'no-subjects-message';
+        noSubjectsMsg.innerHTML = '<p>No subjects available for this combination at this level.</p>';
+        container.appendChild(noSubjectsMsg);
+    }
 }
 
 // Create Subject Card
